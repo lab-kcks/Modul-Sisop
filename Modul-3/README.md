@@ -786,6 +786,12 @@ Program 1 : 30
 
 ## RPC
 
+Remote Procedure Call adalah suatu teknik yang digunakan dalam sistem operasi dan sistem distribusi untuk memfasilitasi komunikasi antara proses yang berjalan pada mesin yang berbeda dengan konsep *client-server*
+
+### Connection
+
+### Data Transfer
+
 ## Extras (Bahan Bacaan Tambahan)
 
 Terdapat beberapa bahan bacaan yang *better to knows* untuk dibaca dan berkaitan dengan modul ini. 
