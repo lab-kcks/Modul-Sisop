@@ -52,7 +52,7 @@ Shell Scripting, Cron, dan AWK adalah tiga komponen penting yang digunakan dalam
 
 Sistem operasi dibagi menjadi tiga komponen penting, yaitu Kernel, Shell, dan *Program Utility* yang dapat ditunjukkan seperti ilustrasi berikut.
 
-![Komponen Sistem Operasi](img/komponenOS.png)
+![Komponen Sistem Operasi](assets/komponenOS.png)
 
 - **Kernel** adalah inti dari komputer. Komponen ini memungkinkan terjadinya komunikasi antara *software* dan *hardware*. Jika Kernel adalah bagian terdalam dari sebuah sistem operasi, maka Shell adalah bagian terluarnya.
 - **Shell** adalah program penerjemah perintah yang menjembatani *user* dengan Kernel. Umumnya, Shell menyediakan *prompt* sebagai *user interface* tempat *user* menginputkan perintah-perintah yang diinginkan, baik berupa perintah internal maupun eksternal. Setelah menerima input dari *user* dan menjalankan program atau perintah berdasarkan input tersebut, Shell akan mengeluarkan *output*. Shell dapat diakses melalui Terminal.
@@ -181,7 +181,7 @@ $ chmod +x hello.sh
 
 Eksekusi *file script* dengan cara `./nama_file.sh` atau `bash nama_file.sh`.
 
-![hello world](img/hello.png)
+![hello world](assets/hello.png)
 
 ## 1.5 Variabel
 - Beberapa hal yang perlu diperhatikan dalam mendefinisikan variabel adalah sebagai berikut.
@@ -245,7 +245,7 @@ echo "Variabel arr ke-3:" ${mahasiswa[3]}
 ```
 Output:
 
-![variabel](img/var.png)
+![variabel](assets/var.png)
 
 ### 1.5.1 Special Variable
 Beberapa special variable yang sering dipakai:
@@ -274,7 +274,7 @@ echo "PID : $$"
 ```
 Output:
 
-![special](img/spesial.png)
+![special](assets/spesial.png)
 
 ## 1.6 Input dan Output
 - `read` digunakan untuk mengambil input dari keyboard dengan syntax sebagai berikut.
@@ -305,7 +305,7 @@ echo -e "\nHai $nama! ,)"
 ```
 Output:
 
-![input](img/io.png)
+![input](assets/io.png)
 
 Selain echo, bash juga menyediakan perintah builtin printf untuk menampilkan output dengan format tertentu, mirip bahasa C. Contoh:
 ```bash
@@ -320,7 +320,7 @@ printf "%d decimal dalam float = %.2f\n" $angka $angka
 ```
 Output:
 
-![printf](img/printf.png)
+![printf](assets/printf.png)
 
 ## 1.7 Quoting
 Shell Unix/Linux memiliki beberapa karakter spesial yang disebut dengan **metakarakter**. Karakter tersebut punya makna khusus jika digunakan di dalam Shell script. Beberapa macam metakarakter:
@@ -358,7 +358,7 @@ echo "Dimana kita? " $dmn
 ```
 
 Output:   
-![hasil-quote](img/quote.png)
+![hasil-quote](assets/quote.png)
 
 Lebih banyak dapat dilihat sendiri di `man bash`
 
@@ -422,7 +422,7 @@ echo "b = $b"
 
 Output:
 
-![hasil-181](img/operasi-aritmatika.png)
+![hasil-181](assets/operasi-aritmatika.png)
 
 ### 1.8.2 Operator Relasional
 
@@ -537,7 +537,7 @@ case "$jawaban" in
 esac
 ```
 Output:   
-![hasil-case](img/switch-case.png)
+![hasil-case](assets/switch-case.png)
 
 ## 1.10 Loop
 **Loop** digunakan untuk mengeksekusi serangkaian perintah berulang kali. Ada beberapa macam Shell loops:
@@ -672,7 +672,7 @@ do
 done
 ```
 Output:   
-![hasil-select-loop](img/select-loop.png)
+![hasil-select-loop](assets/select-loop.png)
 
 ### 1.10.5 Nesting Loops
 Semua jenis loop di atas mendukung konsep nesting, artinya kita dapat menempatkan satu loop ke dalam loop lain, baik loop yang sejenis maupun berbeda jenis
@@ -735,7 +735,7 @@ ask_name
 reply
 ```
 Output:   
-![hasil-fungsi](img/function.png)
+![hasil-fungsi](assets/function.png)
 
 ### 1.11.1 Nested Function
 Sama halnya dengan loop, function juga bisa menerapkan konsep nested. Dimana kita bisa memanggil sebuah fungsi di dalam fungsi.
@@ -756,7 +756,7 @@ reply() {
 ask_name
 ```
 Output:   
-![hasil-fungsi](img/function.png)
+![hasil-fungsi](assets/function.png)
 
 
 ### 1.11.2 Konsep Local dan Global Variabel
@@ -782,7 +782,7 @@ echo "Local Variable di Luar Fungsi : $tmp"
 
 Output:
 
-![local-variable](img/variabel.png)
+![local-variable](assets/variabel.png)
 
 Dari gambar terlihat bahwa ketika kita mencoba melakukan print local variable ke terminal tidak bisa keluar.
 
@@ -808,17 +808,17 @@ Penjelasan:
 ## 2.2 Membuat atau Mengubah Cron Jobs
 1. Ketikkan `crontab -e`
 2. Ketikkan perintah crontab sesuai aturan parameter crontab   
-![parameter crontab](img/syntax-crontab.png "parameter crontab")   
+![parameter crontab](assets/syntax-crontab.png "parameter crontab")   
 3. Untuk melihat daftar cron jobs ketikkan `crontab -l`
 
 Contoh perintah yang dijalankan crontab   
-![contoh crontab](img/crontab.png "contoh crontab")   
+![contoh crontab](assets/crontab.png "contoh crontab")   
 Penjelasan :
 * setiap jam 00.00 memasukkan hasil `ls /home/sisop` ke file `/home/sisop/list_files`
 * setiap minggu menjalankan file `script.sh` pada folder `/home/sisop`
 
 Untuk belajar lebih lanjut perintah-perintah crontab bisa mengakses website [crontab guru](https://crontab.guru/).   
-![web crontab guru](img/crontab-guru.png "web crontab guru")
+![web crontab guru](assets/crontab-guru.png "web crontab guru")
 
 
 </br>

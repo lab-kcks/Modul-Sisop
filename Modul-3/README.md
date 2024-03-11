@@ -17,7 +17,8 @@
     - [Semaphores](#semaphores)
     - [Shared Memory](#shared-memory)
 3. [RPC](#rpc)
-
+    - [Connection](#connection)
+    - [Data Transfer](#data-transfer)
 4. [Extras](#extras-bahan-bacaan-tambahan)
     - [Asynchronous Programming](#asynchronous-programming)
     - [Socket Programming](#socket-programming)
@@ -42,7 +43,7 @@ top -H
 
 ### Multiprocess Vs Multithread
 
-![multivsmulti](multiprocessing_multithreading.gif)
+![multivsmulti](assets/multiprocessing_multithreading.gif)
 
 Perbedaan *multiprocess* dan *multithread*.
 
@@ -681,13 +682,6 @@ Jadi, untuk melindungi hal-hal tersebut, kita memerlukan semaphore untuk mengunc
 
 Semaphore berbeda dengan jenis-jenis IPC yang lain. Pada pengaplikasiannya, semaphore merupakan sebuah counter yang digunakan untuk controlling resource oleh beberapa proses secara bersamaan.
 
-Ilustrasi
-
-![semaphore](https://media.licdn.com/dms/image/C4D12AQE_5m23cEncqg/article-cover_image-shrink_423_752/0/1620572774832?e=1686787200&v=beta&t=HVehtAAGcLgKwce7FK6z2fiqp0689T7Gi3Euwu29GlE)
-
-Gambar di atas menunjukkan ilustrasi dari semaphore, yaitu terdapat critical section dan `V(s)` untuk melakukan increment (signal), dan `P(s)` decrement (wait).
-- Jika suatu counter block memory memiliki nilai positif, semaphore dapat menggunakan resource untuk prosesnya, dan mengurangi nilai counter block dengan 1 untuk menandai bahwa suatu block memory tengah digunakan (proses wait).
-- Sebaliknya, jika semaphore bernilai 0, proses akan masuk pada mode sleep sampai semaphore bernilai lebih besar dari 0 (signal masuk).
 
 </br>
 
@@ -788,9 +782,171 @@ Program 1 : 30
 
 Remote Procedure Call adalah suatu teknik yang digunakan dalam sistem operasi dan sistem distribusi untuk memfasilitasi komunikasi antara proses yang berjalan pada mesin yang berbeda dengan konsep *client-server*
 
-### Connection
+### Communication
 
-### Data Transfer
+Karena konsep RPC adalah berkomunikasi dengan mesin yang berbeda maka diperlukan cara untuk berkomunikasi. Oleh karena itu digunakanlah port dan IP. Dalam C kita bisa menggunakan *socket* dengan sebagai berikut:
+
+**Client**
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+#define PORT 8080
+#define IP "127.0.0.1"
+
+int main() {
+    int sock = 0;
+    struct sockaddr_in serv_addr;
+    int num1 = 10, num2 = 20, result;
+
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        perror("Socket creation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(PORT);
+
+    if (inet_pton(AF_INET, IP, &serv_addr.sin_addr) <= 0) {
+        perror("Invalid address/ Address not supported");
+        exit(EXIT_FAILURE);
+    }
+
+    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+        perror("Connection failed");
+        exit(EXIT_FAILURE);
+    }
+}
+```
+
+**Server**
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+#define PORT 8080
+
+int main() {
+    int server_fd, new_socket;
+    struct sockaddr_in address;
+    int addrlen = sizeof(address);
+    int num1, num2, result;
+
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+        perror("Socket creation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(PORT);
+
+    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
+        perror("Bind failed");
+        exit(EXIT_FAILURE);
+    }
+
+    if (listen(server_fd, 3) < 0) {
+        perror("Listen failed");
+        exit(EXIT_FAILURE);
+    }
+
+    if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen)) < 0) {
+        perror("Accept failed");
+        exit(EXIT_FAILURE);
+    }
+}
+```
+### Message Passing
+![messagepassing](assets/rpc.png)
+Message Passing adalah mekanisme untuk bertukar data dalam IPC. Process A dan Process B berkomunikasi dengan mamanfaatkan kernel seperti pada gambar diatas. Dalam Message Passing, kita memerlukan buffer untuk mengirimkan data. Buffer adalah suatu mekanisme untuk menyimpan data sementara atau lebih mudahnya *booking* memory. Dalam C kita juga bisa menggunakan funsgi `send()` untuk melakukan message passing seperti berikut
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+#define PORT 8080
+#define BUFFER_SIZE 1024
+
+int main() {
+    int server_fd, new_socket;
+    struct sockaddr_in address;
+    int addrlen = sizeof(address);
+    int num1, num2, result;
+    char buffer[BUFFER_SIZE] = {0};
+
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+        perror("Socket creation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(PORT);
+
+    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
+        perror("Bind failed");
+        exit(EXIT_FAILURE);
+    }
+
+    if (listen(server_fd, 3) < 0) {
+        perror("Listen failed");
+        exit(EXIT_FAILURE);
+    }
+
+    while(1) {
+        if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen)) < 0) {
+            perror("Accept failed");
+            exit(EXIT_FAILURE);
+        }
+
+        int bytes_read = read(new_socket, buffer, BUFFER_SIZE);
+        if (bytes_read < 0) {
+            perror("Read failed");
+            close(new_socket);
+            continue;
+        }
+
+        if (bytes_read != sizeof(num1)) {
+            printf("Invalid data received from client\n");
+            close(new_socket);
+            continue;
+        }
+        num1 = *((int*)buffer);
+
+        bytes_read = read(new_socket, buffer, BUFFER_SIZE);
+        if (bytes_read < 0) {
+            perror("Read failed");
+            close(new_socket);
+            continue;
+        }
+
+        if (bytes_read != sizeof(num2)) {
+            printf("Invalid data received from client\n");
+            close(new_socket);
+            continue;
+        }
+        num2 = *((int*)buffer);
+
+        result = num1 + num2;
+
+        int bytes_sent = send(new_socket, &result, sizeof(result), 0);
+        if (bytes_sent < 0) {
+            perror("Send failed");
+        }
+
+        close(new_socket); 
+    }
+
+    return 0;
+}
+```
 
 ## Extras (Bahan Bacaan Tambahan)
 
@@ -1009,3 +1165,4 @@ Jalankan proses *server* dulu, kemudian jalankan *client*-nya. Dan amati apa yan
 - https://linux.die.net/man/4/epoll
 - https://programmer.ink/think/epoll-for-linux-programming.html
 - https://www.geeksforgeeks.org/mutex-lock-for-linux-thread-synchronization/
+- https://alexanderell.is/posts/rpc-from-scratch/
