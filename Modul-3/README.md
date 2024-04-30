@@ -1045,7 +1045,6 @@ Diagram dari *socket* dapat ditunjukkan sebagai berikut.
 
 ![alt](assets/socket.png "implementasi socket C")
 
-Contoh kode dapat dilihat pada [socket-server.c](socket-server.c) dan [socket-client.c](socket-client.c).
 
 **Server**
 
@@ -1150,6 +1149,52 @@ int main(int argc, char const *argv[]) {
 ```
 
 Jalankan proses *server* dulu, kemudian jalankan *client*-nya. Dan amati apa yang terjadi.
+
+### Function Imports
+
+Untuk menggunakan function yang berada di dalam file lain kita bisa mulai define prototype function di dalam `file.h` terlebih dahulu. Selanjutnya kita akan import function di dalam `file.c` dan `using_file_functions.c`. `file.c` berisi function dan `using_file_functions.c` berisi penggunaan dari function yang berada dalam `file.c`. Contohnya:
+
+functions.c
+```c
+#include "functions.h" 
+
+int add(int a, int b) {
+    return a + b;
+}
+```
+
+functions.h
+```c
+#ifndef FUNCTIONS_H
+#define FUNCTIONS_H
+
+int add(int a, int b);
+
+#endif
+```
+
+using_file_functions.c
+```c
+#include <stdio.h>
+#include "functions.h" 
+
+int main() {
+    int result = add(10, 20);
+    printf("Result: %d\n", result);
+    return 0;
+}
+```
+
+untuk compile pun kita harus compile sebagai object terlebih dahulu dan menjadikan satu file exe di akhir
+
+```shell
+gcc -c using_file_functions.c -o using_file_functions.o
+gcc -c functions.c -o functions.o
+
+gcc using_file_functions.o functions.o -o run
+
+./run
+```
 
 ### References 
 
