@@ -668,7 +668,48 @@ Ilustrasi:
 
 Message queue menggunakan prinsip FIFO (First In First Out) tidak terbatas yang tidak dapat diakses oleh dua thread yang berbeda. Dalam melakukan write pesan, banyak tasks dapat menulis pesan ke dalam queue, tetapi hanya satu tasks yang dapat membaca pesan secara sekaligus dari sebuah queue. Pembaca akan menunggu antrian pesan sampai ada pesan yang akan diproses.
 
-Contoh program dapat diakses di [sender](sender.c) dan [receiver](receiver.c).
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+
+#define MAX_SIZE 100
+
+struct msg_buffer {
+    long msg_type;
+    char msg_text[MAX_SIZE];
+};
+
+int main() {
+    key_t key;
+    int msg_id;
+    struct msg_buffer message;
+
+    key = ftok("progfile", 65);
+
+    msg_id = msgget(key, 0666 | IPC_CREAT);
+
+    printf("Enter a message to send: ");
+    fgets(message.msg_text, MAX_SIZE, stdin);
+    message.msg_type = 1;
+
+    msgsnd(msg_id, &message, sizeof(message), 0);
+
+    printf("Message sent: %s", message.msg_text);
+
+    msgrcv(msg_id, &message, sizeof(message), 1, 0);
+    printf("Received message: %s", message.msg_text);
+
+
+    msgctl(msg_id, IPC_RMID, NULL);
+
+    return 0;
+}
+```
 
 </br>
 
@@ -702,8 +743,6 @@ Ilustrasi
 
 * Sebagai catatan, alamat memory dari suatu shared memory pada masing-masing proses belum tentu sama. Dalam hal ini, kita dapat menggunakan semaphore untuk melakukan sinkronisasi.
 
-
-Example: [Proses 1](proses1.c) [Proses 2](proses2.c)
 
 **Proses 1**
 
