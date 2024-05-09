@@ -216,7 +216,7 @@ Untuk lebih jelasnya mari kita coba membuat program FUSE.
 
 
 
-## 1. Instalasi FUSE
+## 1. Implementasi FUSE pada program C
 
 Pertama-tama kita harus memstikan bahwa FUSE sudah ter-install di perangkat anda
 
@@ -649,8 +649,6 @@ fusermount -u [direktori tujuan]
 
 ## Docker Dasar
 
-Sebelum memasuki materi ketiga, peserta wajib membaca dan melakukan intruksi sesuai yang ada pada [Modul Prasyarat Pelatihan Docker](https://github.com/arsitektur-jaringan-komputer/Pelatihan-Docker/tree/master/0.%20Prasyarat).
-
 ### Virtualization vs Containerization
 
 Virtualization adalah teknologi yang memungkinkan pembuatan mesin virtual di dalam satu fisik server. Dengan menggunakan hypervisor, virtualisasi memungkinkan pengelolaan beberapa sistem operasi atau aplikasi yang berjalan secara mandiri. Konsep dasar virtualisasi melibatkan isolasi sumber daya antara mesin virtual, sehingga setiap mesin virtual dapat beroperasi seolah-olah menjadi mesin fisik yang terpisah.
@@ -713,6 +711,7 @@ Dalam pengembangan perangkat lunak modern, aplikasi terdiri dari banyak komponen
 
 Berikut adalah contoh penerapan Docker Compose untuk membuat sebuah aplikasi web yang terdiri dari tiga service, yaitu frontend, backend, dan database.
 
+- `docker-compose.yml`
 ```YAML
 version: '3'
 services:
@@ -774,6 +773,7 @@ Terdapat beberapa jenis Docker Mount sebagai berikut.
 
     Berikut adalah contoh menerapkan Docker Volume pada konfigurasi Docker Compose **`docker-compose.yml`** sebelumnya.
 
+    - `docker-compose.yml`
     ```YAML
     version: '3'
     services:
@@ -864,7 +864,7 @@ Langkah-langkah berikut ini akan membantu dalam mengimplementasikan integrasi FU
 
 - #### Membuat Docker Container dengan File System FUSE
 
-  - Buat file docker-compose.yml dengan konfigurasi berikut:
+  - Buat file `docker-compose.yml` dengan konfigurasi berikut:
     ```YAML
       version: "3"
       services:
@@ -874,15 +874,15 @@ Langkah-langkah berikut ini akan membantu dalam mengimplementasikan integrasi FU
              volumes:
              - [path_ke_file_system_fuse]:[path_tujuan_di_dalam_kontainer]
     ```
-  - Gantilah [nama_image_docker] dengan nama image Docker yang akan kamu gunakan.
-  - Gantilah [path_ke_file_system_fuse] dengan path absolut ke file system FUSE yang ingin dihubungkan ke dalam kontainer.
-  - Gantilah [path_tujuan_di_dalam_kontainer] dengan path di dalam kontainer di mana file system FUSE akan tersedia.
+  - Gantilah `[nama_image_docker]` dengan nama image Docker yang akan kamu gunakan.
+  - Gantilah `[path_ke_file_system_fuse]` dengan path absolut ke file system FUSE yang ingin dihubungkan ke dalam kontainer.
+  - Gantilah `[path_tujuan_di_dalam_kontainer]` dengan path di dalam kontainer di mana file system FUSE akan tersedia.
 
 - #### Menjalankan Docker Container dengan File System FUSE
 
   - Buka terminal, lalu arahkan ke direktori yang berisi file docker-compose.yml.
   - Jalankan perintah berikut untuk menjalankan kontainer:
-    ```YAML
+    ```bash
     docker-compose up -d
     ```
   - Docker akan membuat dan menjalankan kontainer dengan file system FUSE terhubung.
@@ -890,7 +890,7 @@ Langkah-langkah berikut ini akan membantu dalam mengimplementasikan integrasi FU
 - #### Menggunakan Fitur File System FUSE dalam Docker Container
 
   - Akses kontainer Docker dengan menjalankan shell interaktif di dalamnya:
-    ```YAML
+    ```bash
     docker exec -it [nama_kontainer] /bin/bash
     ```
   - Di dalam kontainer, navigasikan ke path yang ditentukan dalam docker-compose.yml untuk mengakses file system FUSE yang terhubung.
@@ -902,19 +902,19 @@ Pastikan untuk mengganti [nama_image_docker], [path_ke_file_system_fuse], dan [p
 
 # Soal Latihan
 
-1. Clemong adalah orang yang suka membalikkan ~fakta~ kata sehingga ia ingin memiliki file system bernama ClemOS yang membalikkan nama-nama file yang ada dalam direktori /home/[user]/Documents. Namun file system tersebut hanya membalikkan nama file saja (tidak termasuk extension/format file) jika berada di dalam folder Clem_[nama folder]. Untuk memudahkannya, anggap bahwa semua string setelah titik terakhir adalah extension. Perhatikan contoh agar lebih jelas:
+1. Adfi adalah orang yang suka membalikkan ~fakta~ kata sehingga ia ingin memiliki file system bernama AdfiOS yang membalikkan nama-nama file yang ada dalam direktori /home/[user]/Documents. Namun file system tersebut hanya membalikkan nama file saja (tidak termasuk extension/format file) jika berada di dalam folder Adfi_[nama folder]. Untuk memudahkannya, anggap bahwa semua string setelah titik terakhir adalah extension. Perhatikan contoh agar lebih jelas:
 
 ```
 /
 │
-└───Clem_SisopEZ
+└───Adfi_Sisopislove
 │   │   Cheatsheet.sisop.zip
 |   |   Daftar_Gebetan.xlsx
 │   │   index.html
 │   └───modul 4 ez
 │       |   bocoransoal.pdf
 |
-└───Probstat
+└───Jarkom
     │   Praktikum.r.zip
     │   kata-penyemangat.txt
 ```
@@ -922,22 +922,22 @@ Menjadi:
 ```
 /
 │
-└───Clem_SisopEZ
+└───Adfi_Sisopislove
 │   │   posis.teehstaehC.zip
 |   |   natebeG_ratfaD.xlsx
 │   │   xedni.html
 │   └───ze 4 ludom
 │       |   laosnarocob.pdf
 |
-└───Probstat
+└───Jarkom
     │   Praktikum.r.zip
     │   kata-penyemangat.txt
 ```
 
 Catatan: 
-- Root pada ClemOS adalah folder /home/[user]/Documents, sehingga yang ditampillkan adalah semua file dan folder di folder Documents.
-- Nama file yang dibalik hanya jika terdapat di dalam folder Clem_[nama folder], berapapun kedalamannya.
-- Cobalah buat folder Clem_[nama folder] untuk menguji.
+- Root pada AdfiOS adalah folder /home/[user]/Documents, sehingga yang ditampillkan adalah semua file dan folder di folder Documents.
+- Nama file yang dibalik hanya jika terdapat di dalam folder Adfi_[nama folder], berapapun kedalamannya.
+- Cobalah buat folder Adfi_[nama folder] untuk menguji.
 
 
 2. Buat sebuah file system yang mengarah ke /home/[user]/Downloads. File system ini memiliki fitur pencatatan, dimana ketika folder pada file system tersebut diakses, pengaksesan tersebut akan ditulis pada file log.log dengan format `"%.3s %.3s%3d %.2d:%.2d:%.2d %d: %s\n", hari, bulan, tanggal, jam, menit, detik, tahun, folder`. Misalnya: `Mon Apr 11 20:12:47 2022: /sample`.
