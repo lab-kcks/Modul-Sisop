@@ -683,7 +683,7 @@ Untuk memeriksa apakah samba sudah terinstal, dapat digunakan beberapa cara beri
 
   Apabila muncul versi dari Samba seperti pada contoh berikut,
 
-  [gambar]
+  ![samba_versi](./img/samba_ver.png)
 
   maka samba telah berhasil diinstal
 
