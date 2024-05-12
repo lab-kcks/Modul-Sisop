@@ -41,7 +41,6 @@
     - [Menghubungkan Server](#menghubungkan-server)
     - [Login untuk Masuk ke Server](#login-untuk-masuk-ke-server)
   - [5. Mematikan Samba Server](#5-mematikan-samba-server)
-  - [6. Samba dan VPN](#6-samba-dan-vpn)
 - [Pengetahuan Tambahan](#pengetahuan-tambahan)
   - [Docker Dasar](#docker-dasar)
     - [Virtualization vs Containerization](#virtualization-vs-containerization)
@@ -901,10 +900,6 @@ kalian juga bisa menghapus program Samba dengan perintah
 ```bash
 sudo apt remove samba
 ```
-
-## 6. Samba dan VPN
-
-???
 
 # Pengetahuan Tambahan
 
