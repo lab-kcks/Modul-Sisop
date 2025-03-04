@@ -906,6 +906,123 @@ Ada berapa "732"?
 
 Pada contoh di atas, rule kedua hanya memiliki action untuk melakukan perhitungan berapa jumlah baris yang mengandung "732", namun tidak ada action untuk menampilkan (print).
 
+## 3.3 Built-in Variables di AWK
+
+AWK memiliki sejumlah variabel bawaan yang dapat digunakan untuk mengakses informasi tentang input dan output. Berikut adalah beberapa variabel bawaan yang paling umum digunakan:
+
+| Variabel | Deskripsi | Contoh |
+|---|---|---|
+| `NR` | Nomor record (baris) saat ini. | `awk 'NR==2 {print $0}' file.txt` (mencetak baris kedua) |
+| `NF` | Jumlah field (kolom) dalam record saat ini. | `awk '{print NF}' file.txt` (mencetak jumlah kolom di setiap baris) |
+| `FS` | Field separator (pemisah kolom). | `awk 'BEGIN {FS=","} {print $1}' file.csv` (menggunakan koma sebagai pemisah kolom) |
+| `RS` | Record separator (pemisah baris). | `awk 'BEGIN {RS=""} {print $1}' file.txt` (menggunakan baris kosong sebagai pemisah baris) |
+| `OFS` | Output field separator (pemisah kolom output). | `awk 'BEGIN {OFS=":"} {print $1, $2}' file.txt` (menggunakan titik dua sebagai pemisah kolom output) |
+| `ORS` | Output record separator (pemisah baris output). | `awk 'BEGIN {ORS="\n\n"} {print $0}' file.txt` (menggunakan dua baris baru sebagai pemisah baris output) |
+
+### Contoh Output
+
+Semisal kita menggunakan data `data.csv` yang berisi text berikut:
+```
+apel,merah,manis
+pisang,kuning,lembut
+jeruk,oranye,segar
+```
+
+1. `NR` (Nomor Record):
+    - Command: `awk 'NR == 2 {print $0}' data.csv`
+    - Output:
+    ```
+    pisang,kuning,lembut
+    ```
+    - Penjelasan: Karena `NR==2` jadi command tersebut bakal mencetak baris kedua dari file.
+
+2. `NF` (Nomor Field / Kolom):
+    - Command: `awk '{print NF}' data.csv`
+    - Output:
+    ```
+    3
+    3
+    3
+    ```
+    - Penjelasan: Mencetak jumlah field / kolom, dalam kasus ini 3 `pisang,kuning,lembut`
+
+3. `FS` (Field Separator):
+    - Command: `awk 'BEGIN {FS=","} {print $1}' data.csv`
+    - Output:
+    ```
+    apel
+    pisang
+    jeruk
+    ```
+    - Penjelasan: Pemisah field diubah menjadi `,` dan mencetak field pertama `print $1`
+
+4. `OFS` (Output Field Separator):
+    - Command: `awk 'BEGIN {FS=","; OFS=":"} {print $1, $2}' data.csv`
+    - Output:
+    ```
+    apel:merah
+    pisang:kuning
+    jeruk:oranye
+    ```
+    - Penjelasan: Menggunakan koma sebagai pemisah input dan titik dua sebagai pemisah output.
+
+5. `ORS` (Output Record Separator):
+    - Command: `awk 'BEGIN {ORS="\n\n"} {print $0}' data.csv`
+    - Output:
+    ```
+    apel,merah,manis
+
+    pisang,kuning,lembut
+
+    jeruk,oranye,segar
+
+    ```
+    - Penjelasan: Menggunakan dua baris baru sebagai pemisah baris output.
+
+## 3.4 Array Dalam AWK
+
+Dalam `awk`, array adalah struktur data yang memungkinkan Kita untuk menyimpan beberapa nilai di bawah satu nama variabel. Array di `awk` bersifat **asosiatif**, yang berarti indeks array dapat berupa string atau angka.
+
+**Karakteristik Array AWK**
+
+- Asosiatif: Indeks array dapat berupa string atau angka
+- Dinamis: Ukuran array tidak perlu di definisikan terlebih dahulu
+- Tidak perlu dekralasi: Array dibuat secara otomatis saat elemen pertama ditambahkan.
+
+**Sintaks Array AWK**
+
+```awk
+array[indeks] = nilai
+```
+
+**Contoh Penggunakan Array**
+
+Sebagai contoh kita menggunakan file `buah.txt` sederhana berikut:
+```
+apel merah
+pisang kuning
+apel hijau
+jeruk oranye
+pisang hijau
+```
+
+jika kita ingin menghitung **Jumlah Kemunculan Kata**, kita jalankan command berikut:
+```awk
+awk '{count[$1]++} END {for (buah in count) print buah, count[buah]}' buah.txt
+```
+
+- Output:
+    ```
+    jeruk 1
+    pisang 2
+    apel 2
+    ```
+
+- Penjelasan: 
+    - `count[$1]++`: Untuk setiap baris, field pertama (`$1`) digunakan sebagai indeks array count. Nilai array `count` pada indeks tersebut bertambah 1.
+    - `END {for (buah in count) print buah, count[buah]}`: Setelah semua baris diproses,`for` loop digunakan untuk mencetak setiap elemen array `count`.
+
+Jika ingin melihat contoh lebih lanjut bisa dilihat di sumber [berikut](https://www.tutorialspoint.com/awk/awk_arrays.htm)
 
 </br>
 
@@ -917,3 +1034,6 @@ Pada contoh di atas, rule kedua hanya memiliki action untuk melakukan perhitunga
 * [https://www.codepolitan.com/belajar-bash-mencoba-bash-untuk-pertama-kali-57bbca3c28e54-17341](https://www.codepolitan.com/belajar-bash-mencoba-bash-untuk-pertama-kali-57bbca3c28e54-17341)
 * [https://www.geeksforgeeks.org/internal-and-external-commands-in-linux/#:~:text=The%20UNIX%20system%20is%20command,are%20built%20into%20the%20shell.&text=External%20Commands%20%3A%20Commands%20which%20aren't%20built%20into%20the%20shell](https://www.geeksforgeeks.org/internal-and-external-commands-in-linux/#:~:text=The%20UNIX%20system%20is%20command,are%20built%20into%20the%20shell.&text=External%20Commands%20%3A%20Commands%20which%20aren't%20built%20into%20the%20shell)
 * [https://tldp.org/LDP/abs/html/localvar.html](https://tldp.org/LDP/abs/html/localvar.html)
+* [https://www.tutorialspoint.com/awk](https://www.tutorialspoint.com/awk)
+* [https://www.geeksforgeeks.org/awk-command-unixlinux-examples/](https://www.geeksforgeeks.org/awk-command-unixlinux-examples/)
+* [https://www.grymoire.com/Unix/Awk.html](https://www.grymoire.com/Unix/Awk.html)
