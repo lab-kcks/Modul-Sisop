@@ -43,6 +43,8 @@ Shell Scripting, Cron, dan AWK adalah tiga komponen penting yang digunakan dalam
   - [3.2 Menjalankan Program AWK](#32-menjalankan-program-awk)
     - [Cara Kerja AWK](#cara-kerja-awk)
   - [3.2 Special Rules](#32-special-rules)
+  - [3.3 Built-in Variable](#33-built-in-variables-di-awk)
+  - [3.4 Array dalam AWK](#34-array-dalam-awk)
 - [Referensi](#referensi)
 
 </br>
