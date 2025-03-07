@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <string.h>
+#include <errno.h>
 
 int main()
 {
@@ -8,49 +10,59 @@ int main()
     char filename[100];
     int r;
 
-    printf("Enter path to list files: ");
-    scanf("%s", filename);
-
-    r = stat(filename,&fs);
-    if( r==-1 )
-    {
-        fprintf(stderr,"File error\n");
-        exit(1);
+    printf("Enter path to check file permissions: ");
+    if (scanf("%99s", filename) != 1) {
+        fprintf(stderr, "Error reading input\n");
+        return EXIT_FAILURE;
     }
 
-    printf("Obtaining permission mode for '%s':\n",filename);
+    r = stat(filename, &fs);
+    if (r == -1) {
+        fprintf(stderr, "Error accessing '%s': %s\n", filename, strerror(errno));
+        return EXIT_FAILURE;
+    }
 
-    if( S_ISREG(fs.st_mode) )
-        puts("Regular file");
+    printf("\nObtaining permission mode for '%s':\n", filename);
+
+    printf("File type: ");
+    if (S_ISREG(fs.st_mode))
+        printf("Regular file\n");
+    else if (S_ISDIR(fs.st_mode))
+        printf("Directory\n");
+    else if (S_ISLNK(fs.st_mode))
+        printf("Symbolic link\n");
     else
-        puts("Not a regular file");
+        printf("Other\n");
 
     printf("Owner permissions: ");
-    if( fs.st_mode & S_IRUSR )
+    if (fs.st_mode & S_IRUSR)
         printf("read ");
-    if( fs.st_mode & S_IWUSR )
+    if (fs.st_mode & S_IWUSR)
         printf("write ");
-    if( fs.st_mode & S_IXUSR )
+    if (fs.st_mode & S_IXUSR)
         printf("execute");
     putchar('\n');
 
     printf("Group permissions: ");
-    if( fs.st_mode & S_IRGRP )
+    if (fs.st_mode & S_IRGRP)
         printf("read ");
-    if( fs.st_mode & S_IWGRP )
+    if (fs.st_mode & S_IWGRP)
         printf("write ");
-    if( fs.st_mode & S_IXGRP )
+    if (fs.st_mode & S_IXGRP)
         printf("execute");
     putchar('\n');
 
     printf("Others permissions: ");
-    if( fs.st_mode & S_IROTH )
+    if (fs.st_mode & S_IROTH)
         printf("read ");
-    if( fs.st_mode & S_IWOTH )
+    if (fs.st_mode & S_IWOTH)
         printf("write ");
-    if( fs.st_mode & S_IXOTH )
+    if (fs.st_mode & S_IXOTH)
         printf("execute");
     putchar('\n');
 
-    return 0;
+    // Print numeric mode
+    printf("Numeric mode: %o\n", fs.st_mode & 0777);
+
+    return EXIT_SUCCESS;
 }
