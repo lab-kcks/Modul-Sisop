@@ -48,11 +48,11 @@ Setiap proses memiliki identifier tersendiri dan juga setelah proses tersebut me
 
 Untuk melihat proces yang sedang berjalan di OS, dapat menggunakan `ps`.
 
-![show ps](assets/ps.jpg)
+![show ps](assets/ps.png)
 
 atau jika ingin lebih jelas dan detail dapat menggunakan command `ps aux`.
 
-![show psaux](assets/psaux.jpg)
+![show psaux](assets/psaux.png)
 
 perbedaan nya adalah jika hanya mengguanakan ps maka akan melihat proses hanya di user tersebut dan jika ps aux akan memperlihatkan semua proses yang berjalan meskipun di user lain.
 
@@ -69,7 +69,7 @@ Penjelasan:
 
 Kita juga dapat melihat proses yang berjalan dalam bentuk tree, sehingga kita dengan mudah mengidentifikasi mana yang merupakan child proses dan mana parent nya. Dengan mengguunakan command `pstree`
 
-![show pstree](assets/pstree.jpg)
+![show pstree](assets/pstree.png)
 
 ### Menghentikan Proses
 
@@ -227,13 +227,13 @@ Dengan menggunakan `&` diakhir command kita dapat menjalankan program di latar b
 
 contoh implementasinya pada command wget dibawah:
 
-![show background](assets/background.jpg)
+![show background](assets/background.png)
 
 Dengan demikian kita tidak harus menunggu dan tetap bisa menggunakan terminal untuk keperluan yang lain. Dan jika ingin melihat progres dari proses tersebut bisa menggunakan command `jobs`.
 
 Dan ini jika kita menjalankannya di foreground:
 
-![show foreground](assets/foreground.jpg)
+![show foreground](assets/foreground.png)
 
 Jika seperti ini maka proses akan berjalan secara foreground sehingga akan muncul di layar kalian.
 
