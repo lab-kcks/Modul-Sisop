@@ -942,11 +942,11 @@ jeruk,oranye,segar
     - Command: `awk '{print NF}' data.csv`
     - Output:
     ```
-    3
-    3
-    3
+    1
+    1
+    1
     ```
-    - Penjelasan: Mencetak jumlah field / kolom, dalam kasus ini 3 `pisang,kuning,lembut`
+    - Penjelasan: Mencetak jumlah field / kolom, dalam kasus ini 1 `pisang,kuning,lembut`. Mengapa tidak 3? karena disini kita belum assign `Field Separator` sebagai indikator bahwa itu merupakan kolom baru. 
 
 3. `FS` (Field Separator):
     - Command: `awk 'BEGIN {FS=","} {print $1}' data.csv`
