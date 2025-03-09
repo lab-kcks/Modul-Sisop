@@ -1,6 +1,6 @@
 <div align=center>
 
-# File System, FUSE, dan Samba
+# File System - FUSE
 
 </div>
 
@@ -15,7 +15,7 @@
 
 ## Daftar Isi
 
-- [File System dan FUSE](#file-system-dan-fuse)
+- [File System - FUSE](#file-system---fuse)
   - [Objectives](#objectives)
   - [Daftar Isi](#daftar-isi)
 - [File System](#file-system)
@@ -25,7 +25,7 @@
   - [4. Superblock](#4-superblock)
   - [5. Inode](#5-inode)
 - [File System in Userspace (FUSE)](#file-system-in-userspace-fuse)
-  - [1. Instalasi FUSE](#1-instalasi-fuse)
+  - [1. Implementasi FUSE pada program C](#1-implementasi-fuse-pada-program-c)
   - [2. Cara Kerja FUSE](#2-cara-kerja-fuse)
   - [3. Membuat Program FUSE](#3-membuat-program-fuse)
     - [Tips](#tips)
@@ -39,6 +39,9 @@
   - [4. Terhubung pada Samba Server](#4-terhubung-pada-samba-server)
     - [Mencari IP Address](#mencari-ip-address)
     - [Menghubungkan Server](#menghubungkan-server)
+      - [Pada Ubuntu](#pada-ubuntu)
+      - [Pada MacOS](#pada-macos)
+      - [Pada Windows](#pada-windows)
     - [Login untuk Masuk ke Server](#login-untuk-masuk-ke-server)
   - [5. Mematikan Samba Server](#5-mematikan-samba-server)
 - [Pengetahuan Tambahan](#pengetahuan-tambahan)
