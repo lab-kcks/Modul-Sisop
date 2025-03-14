@@ -19,6 +19,7 @@
     - [Pembuatan Daemon](#pembuatan-daemon)
     - [Implementasi Daemon](#implementasi-daemon)
   - [Extras](#extras)
+    - [FILE Handling dalam C](#file-handling-dalam-c)
     - [Directory Listing dalam C](#directory-listing-dalam-c)
     - [File Permission dalam C](#file-permission-dalam-c)
     - [File Ownership dalam C](#file-ownership-dalam-c)
@@ -592,6 +593,226 @@ Untuk mematikan daemon process kita akan menggunakan perintah `kill`. Pertama ki
 
 ## Extras
 
+### FILE Handling dalam C
+
+Di bahasa C, kita dapat melakukan operasi create, open, read, write, dan close pada suatu file. Cara melakukan akses pada suatu file di bahasa C yaitu dengan memakai **file pointer**:
+
+```c
+FILE* fptr;
+```
+
+Kemudian untuk operasi-operasi yang dilakukan dengan adanya file pointer yaitu sebagai berikut:
+
+**Open**
+
+
+```c
+// Syntax
+// FILE* fopen(const char *file_name, const char *access_mode);
+fptr = fopen("filename.txt", "r");
+```
+
+Di contoh ini, file **filename.txt** dibuka dan masuk ke file pointer **fptr**, yang dibuka dengan mode read (r). Terdapat beberapa mode-mode yang bisa dipakai saat membuka file:
+v
+| Mode | Deskripsi |
+|------|-----------|
+| r | Membuka file untuk dibaca. Jika file tidak ada, `fopen()` mengembalikan NULL. |
+| rb | Membuka file dalam mode biner untuk dibaca. Jika file tidak ada, mengembalikan NULL. |
+| w | Membuka file untuk ditulis. Jika file ada, isinya akan ditimpa. Jika tidak ada, file baru dibuat. |
+| wb | Membuka file dalam mode biner untuk ditulis. Menimpa jika ada, membuat baru jika tidak ada. |
+| a | Membuka file untuk ditambahkan (append). Data ditambahkan di akhir file. Membuat file baru jika tidak ada. |
+| ab | Membuka file dalam mode biner untuk ditambahkan. Membuat file baru jika tidak ada. |
+| r+ | Membuka file untuk dibaca dan ditulis. File harus sudah ada. |
+| rb+ | Membuka file dalam mode biner untuk dibaca dan ditulis. File harus sudah ada. |
+| w+ | Membuka file untuk dibaca dan ditulis. Menimpa file jika ada, membuat baru jika tidak ada. |
+| wb+ | Membuka file dalam mode biner untuk dibaca dan ditulis. Menimpa jika ada, membuat baru jika tidak ada. |
+| a+ | Membuka file untuk dibaca dan ditambahkan. Membuat file baru jika tidak ada. |
+| ab+ | Membuka file dalam mode biner untuk dibaca dan ditambahkan. Membuat file baru jika tidak ada. |
+
+
+**Create**
+
+```c
+fptr = fopen("filename.txt", "w");
+```
+
+**Read**
+
+Ada beberapa cara untuk membaca isi file dalam bahasa C:
+
+1. Membaca per karakter dengan `fgetc()`:
+```c
+FILE* fptr;
+char c;
+
+fptr = fopen("filename.txt", "r");
+if (fptr == NULL) {
+    printf("Error opening file!\n");
+    exit(1);
+}
+
+// Membaca karakter satu per satu sampai akhir file
+while ((c = fgetc(fptr)) != EOF) {
+    printf("%c", c);
+}
+
+fclose(fptr);
+```
+
+2. Membaca per baris dengan `fgets()`:
+```c
+FILE* fptr;
+char buffer[1024];
+
+fptr = fopen("filename.txt", "r");
+if (fptr == NULL) {
+    printf("Error opening file!\n");
+    exit(1);
+}
+
+// Membaca baris satu per satu
+while (fgets(buffer, sizeof(buffer), fptr)) {
+    printf("%s", buffer);
+}
+
+fclose(fptr);
+```
+
+3. Membaca data terformat dengan `fscanf()`:
+```c
+FILE* fptr;
+int num;
+char name[50];
+
+fptr = fopen("data.txt", "r"); // Anggap file berisi: "1 John\n2 Jane"
+if (fptr == NULL) {
+    printf("Error opening file!\n");
+    exit(1);
+}
+
+// Membaca data terformat
+while (fscanf(fptr, "%d %s", &num, name) == 2) {
+    printf("Num: %d, Name: %s\n", num, name);
+}
+
+fclose(fptr);
+```
+
+**Write**
+
+Untuk menulis ke dalam file, kita dapat menggunakan beberapa fungsi:
+
+1. Menulis per karakter dengan `fputc()`:
+```c
+FILE* fptr;
+char c = 'A';
+
+fptr = fopen("output.txt", "w");
+if (fptr == NULL) {
+    printf("Error opening file!\n");
+    exit(1);
+}
+
+fputc(c, fptr); // Menulis karakter 'A' ke file
+
+fclose(fptr);
+```
+
+2. Menulis string dengan `fputs()`:
+```c
+FILE* fptr;
+char text[] = "Hello, World!";
+
+fptr = fopen("output.txt", "w");
+if (fptr == NULL) {
+    printf("Error opening file!\n");
+    exit(1);
+}
+
+fputs(text, fptr); // Menulis string ke file
+
+fclose(fptr);
+```
+
+3. Menulis data terformat dengan `fprintf()`:
+```c
+FILE* fptr;
+int id = 1;
+char name[] = "John";
+
+fptr = fopen("output.txt", "w");
+if (fptr == NULL) {
+    printf("Error opening file!\n");
+    exit(1);
+}
+
+fprintf(fptr, "ID: %d, Name: %s\n", id, name); // Menulis data terformat ke file
+
+fclose(fptr);
+```
+
+**Close**
+
+Setelah selesai menggunakan file, penting untuk menutupnya dengan fungsi `fclose()`:
+
+```c
+fclose(fptr);
+```
+
+Menutup file setelah digunakan sangat penting karena:
+1. Memastikan semua data telah ditulis ke disk
+2. Membebaskan sumber daya sistem
+3. Memungkinkan program lain mengakses file tersebut
+4. Mencegah kebocoran memori (memory leak)
+
+**Contoh Lengkap Program File Handling**
+
+Berikut adalah contoh program yang menggabungkan proses membuka, menulis, membaca, dan menutup file:
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    FILE* fptr;
+    char buffer[100];
+    
+    // Menulis ke file
+    fptr = fopen("example.txt", "w");
+    if (fptr == NULL) {
+        printf("Error opening file for writing!\n");
+        return 1;
+    }
+    
+    fprintf(fptr, "Baris pertama.\n");
+    fprintf(fptr, "Baris kedua dengan angka %d.\n", 42);
+    fclose(fptr);
+    
+    // Membaca dari file
+    fptr = fopen("example.txt", "r");
+    if (fptr == NULL) {
+        printf("Error opening file for reading!\n");
+        return 1;
+    }
+    
+    printf("Isi file example.txt:\n");
+    while (fgets(buffer, sizeof(buffer), fptr)) {
+        printf("%s", buffer);
+    }
+    
+    fclose(fptr);
+    
+    return 0;
+}
+```
+
+Contoh output program di atas:
+```
+Isi file example.txt:
+Baris pertama.
+Baris kedua dengan angka 42.
+```
+
 ### Directory Listing dalam C
 
 Dengan bahasa C, kita bisa melihat ada file apa saja yang terdapat dalam suatu directory. Hal ini membutuhkan library khusus bernama `dirent.h`. Berikut contoh directory listing di bahasa C:
@@ -863,3 +1084,4 @@ int main()
 - https://pubs.opengroup.org/onlinepubs/009695399/functions/getgrgid.html
 - https://pubs.opengroup.org/onlinepubs/009695399/functions/getpwuid.html
 - https://www.geeksforgeeks.org/exit-status-child-process-linux/
+- https://www.geeksforgeeks.org/basics-file-handling-c/
