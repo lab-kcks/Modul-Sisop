@@ -10,15 +10,16 @@
     - [Multiprocess Vs Multithread](#multiprocess-vs-multithread)
     - [Pembuatan Thread](#pembuatan-thread)
     - [Join Thread](#join-thread)
-    - [Mutual Exclution](#mutual-exclusion)
+    - [Mutual Exclusion](#mutual-exclusion)
 2. [IPC](#ipc)
     - [Pipes](#pipes)
+    - [Named Pipes](#named-pipes)
     - [Message Queues](#message-queues)
     - [Semaphores](#semaphores)
     - [Shared Memory](#shared-memory)
 3. [RPC](#rpc)
     - [Communication](#communication)
-    - [Message Passing](#message-Passing)
+    - [Message Passing](#message-passing)
 4. [Extras](#extras-bahan-bacaan-tambahan)
     - [Asynchronous Programming](#asynchronous-programming)
     - [Socket Programming](#socket-programming)
@@ -657,6 +658,91 @@ int main()
 ```
 
 </br>
+
+### Named Pipes
+
+Named pipe adalah sebuah perpanjangan dari konsep pipe biasa di Unix. Perbedaannya adalah pipe biasa tidak mempunyai nama tertentu dan hanya ada untuk sementara waktu saja, sedangkan named pipe bisa bertahan selama sistem masih hidup hingga sistem tersebut dihapus secara eksplisit. Named pipe muncul sebagai file spesial di dalam filesystem, dan banyak proses dapat terhubung dengan named pipe tersebut untuk read dan write, memfasilitasi IPC.
+
+Sebuah file FIFO memungkinkan dua atau lebih proses untuk saling berkomunikasi dengan read dan write file yang sama. Jenis file ini dapat dibuat dengan menggunakan function 'mkfifo' di C. Setelah dibuat, proses apa pun dapat membuka dan menggunakan named pipe untuk read maupun write, sama seperti cara menangani file biasa. Namun, penting untuk dicatat bahwa named pipe harus dibuka secara bersamaan di kedua ujungnya (untuk read dan write) sebelum operasi input atau output apa pun dapat terjadi.
+
+Contoh dari program C untuk named pipes adalah sebagai berikut.
+
+**Program 1 (write first)**
+
+```c
+// This side writes first, then reads
+#include <stdio.h>
+#include <string.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+int main()
+{
+    int fd;
+
+    char * myfifo = "/tmp/myfifo";
+
+    mkfifo(myfifo, 0666);
+
+    char arr1[80], arr2[80];
+    while (1)
+    {
+        fd = open(myfifo, O_WRONLY);
+
+        fgets(arr2, 80, stdin);
+
+        write(fd, arr2, strlen(arr2)+1);
+        close(fd);
+
+        fd = open(myfifo, O_RDONLY);
+
+        read(fd, arr1, sizeof(arr1));
+
+        printf("User2: %s\n", arr1);
+        close(fd);
+    }
+    return 0;
+}
+```
+
+**Program 2 (read first)**
+
+```c
+// This side reads first, then reads
+#include <stdio.h>
+#include <string.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+int main()
+{
+    int fd1;
+
+    char * myfifo = "/tmp/myfifo";
+
+    mkfifo(myfifo, 0666);
+
+    char str1[80], str2[80];
+    while (1)
+    {
+        fd1 = open(myfifo,O_RDONLY);
+        read(fd1, str1, 80);
+
+        printf("User1: %s\n", str1);
+        close(fd1);
+
+        fd1 = open(myfifo,O_WRONLY);
+        fgets(str2, 80, stdin);
+        write(fd1, str2, strlen(str2)+1);
+        close(fd1);
+    }
+    return 0;
+}
+```
 
 ### Message Queues
 
