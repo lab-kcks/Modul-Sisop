@@ -44,7 +44,7 @@
       - [Pada Windows](#pada-windows)
     - [Login untuk Masuk ke Server](#login-untuk-masuk-ke-server)
   - [5. Mematikan Samba Server](#5-mematikan-samba-server)
-- [Pengetahuan Tambahan](#pengetahuan-tambahan)
+- [Docker](#docker)
   - [Docker Dasar](#docker-dasar)
     - [Virtualization vs Containerization](#virtualization-vs-containerization)
     - [Pengenalan Docker](#pengenalan-docker)
@@ -904,7 +904,7 @@ kalian juga bisa menghapus program Samba dengan perintah
 sudo apt remove samba
 ```
 
-# Pengetahuan Tambahan
+# Docker
 
 ## Docker Dasar
 
