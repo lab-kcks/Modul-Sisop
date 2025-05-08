@@ -30,20 +30,6 @@
   - [3. Membuat Program FUSE](#3-membuat-program-fuse)
     - [Tips](#tips)
   - [4. Unmount FUSE](#4-unmount-fuse)
-- [Samba File Server](#samba-file-server)
-  - [1. Instalasi Samba](#1-instalasi-samba)
-  - [2. Konfigurasi Samba](#2-konfigurasi-samba)
-    - [Konfigurasi Default](#konfigurasi-default)
-    - [Mount Direktori pada Samba Server](#mount-direktori-pada-samba-server)
-  - [3. Menambahkan User pada Samba](#3-menambahkan-user-pada-samba)
-  - [4. Terhubung pada Samba Server](#4-terhubung-pada-samba-server)
-    - [Mencari IP Address](#mencari-ip-address)
-    - [Menghubungkan Server](#menghubungkan-server)
-      - [Pada Ubuntu](#pada-ubuntu)
-      - [Pada MacOS](#pada-macos)
-      - [Pada Windows](#pada-windows)
-    - [Login untuk Masuk ke Server](#login-untuk-masuk-ke-server)
-  - [5. Mematikan Samba Server](#5-mematikan-samba-server)
 - [Docker](#docker)
   - [Docker Dasar](#docker-dasar)
     - [Virtualization vs Containerization](#virtualization-vs-containerization)
@@ -57,6 +43,21 @@
     - [Docker Data Management](#docker-data-management)
       - [Jenis-Jenis Docker Mount](#jenis-jenis-docker-mount)
     - [Integrasi FUSE dengan Docker](#integrasi-fuse-dengan-docker)
+- [Pengetahuan Tambahan](#pengetahuan-tambahan)
+- [Samba](#samba)
+  - [1. Instalasi Samba](#1-instalasi-samba)
+  - [2. Konfigurasi Samba](#2-konfigurasi-samba)
+    - [Konfigurasi Default](#konfigurasi-default)
+    - [Mount Direktori pada Samba Server](#mount-direktori-pada-samba-server)
+  - [3. Menambahkan User pada Samba](#3-menambahkan-user-pada-samba)
+  - [4. Terhubung pada Samba Server](#4-terhubung-pada-samba-server)
+    - [Mencari IP Address](#mencari-ip-address)
+    - [Menghubungkan Server](#menghubungkan-server)
+      - [Pada Ubuntu](#pada-ubuntu)
+      - [Pada MacOS](#pada-macos)
+      - [Pada Windows](#pada-windows)
+    - [Login untuk Masuk ke Server](#login-untuk-masuk-ke-server)
+  - [5. Mematikan Samba Server](#5-mematikan-samba-server)
 - [Soal Latihan](#soal-latihan)
 - [References](#references)
 
@@ -656,254 +657,6 @@ atau
 fusermount -u [direktori tujuan]
 ```
 
-# Samba File Server
-
-Samba merupakan sebuah program yang dapat digunakan untuk membuat sebuah file server. Samba mampu mengintegrasikan server linux / unix atau windows menjadi <i>Active Directory Environment</i> melalui jaringan SMB yang memungkinkan untuk berbagi sumber daya seperti data dan printer.
-
-Samba sering digunakan sebagai file server seperti google drive yang dapat digunakan bersama-sama. Konfigurasi dan penggunaannya yang mudah menjadikan Samba sebagai pilihan populer untuk pembuatan file server.
-
-![samba](./img/contoh%20samba.png)
-
-Samba juga dilengkapi dengan konfigurasi user sehingga keamanan file server dapat terjamin.
-
-Selengkapnya tentang Samba terdapat pada [link berikut](https://www.samba.org/samba/).
-
-## 1. Instalasi Samba
-
-Instalasi Samba dapat dilakukan dengan menggunakan perintah `apt install` seperti instalasi linux pada umumnya
-
-```bash
-sudo apt install samba
-```
-
-Untuk memeriksa apakah samba sudah terinstal, dapat digunakan beberapa cara berikut:
-
-- Periksa versi Samba
-  ```bash
-  smbd -V
-  ```
-
-  Apabila muncul versi dari Samba seperti pada contoh berikut,
-
-  ![samba_versi](./img/samba_ver.png)
-
-  maka samba telah berhasil diinstal
-
-- Periksa status service Samba
-  ```bash
-  service smbd status
-  ```
-
-  Status dapat berupa `active` ataupun `inactive`. Selama service smbd telah dikenali, maka Samba telah berhasil diinstal
-
-- Periksa direktori Samba
-  ```bash
-  ls /etc/samba
-  ```
-
-  File konfigurasi Samba terletak pada direktori `/etc/samba` yang terbuat secara otomatis ketika menginstal Samba. Apabila direktori tersebut telah muncul, maka instalasi Samba berhasil dilakukan.
-
-## 2. Konfigurasi Samba
-
-Saat membuka file konfigurasi Samba `smb.conf`, kalian akan bertemu dengan konfigurasi default Samba yang mencapai lebih dari 200 baris.
-
-Namun dalam praktikum ini, kita akan membuat konfigurasi kita sendiri, sehingga konfigurasi default dari Samba dapat kita hiraukan.
-
-### Konfigurasi Default
-
-Untuk memudahkan pembacaan, kalian bisa gunakan konfigurasi ini sebagai konfigurasi default kalian
-
-- `/etc/samba/smb.conf`
-```conf
-#======================= Global Settings =======================
-
-[global]
-
-## Browsing/Identification ###
-
-   workgroup = WORKGROUP
-
-   server string = %h server (Samba, Ubuntu)
-
-
-#### Networking ####
-
-;   interfaces = 127.0.0.0/8 eth0
-
-;   bind interfaces only = yes
-
-
-#### Debugging/Accounting ####
-
-   log file = /var/log/samba/log.%m
-
-   max log size = 1000
-
-   logging = file
-
-   panic action = /usr/share/samba/panic-action %d
-
-
-####### Authentication #######
-
-   server role = standalone server
-
-   obey pam restrictions = yes
-
-   unix password sync = yes
-
-   passwd program = /usr/bin/passwd %u
-   passwd chat = *Enter\snew\s*\spassword:* %n\n *Retype\snew\s*\spassword:* %n\n *password\supdated\ssuccessfully* .
-
-   pam password change = yes
-
-   map to guest = bad user
-
-########## Domains ###########
-
-;   logon path = \\%N\profiles\%U
-
-;   logon drive = H:
-
-;   logon script = logon.cmd
-
-; add user script = /usr/sbin/adduser --quiet --disabled-password --gecos "" %u
-
-; add machine script  = /usr/sbin/useradd -g machines -c "%u machine account" -d /var/lib/samba -s /bin/false %u
-
-; add group script = /usr/sbin/addgroup --force-badname %g
-
-############ Misc ############
-
-;   include = /home/samba/etc/smb.conf.%m
-
-;   idmap config * :              backend = tdb
-;   idmap config * :              range   = 3000-7999
-;   idmap config YOURDOMAINHERE : backend = tdb
-;   idmap config YOURDOMAINHERE : range   = 100000-999999
-;   template shell = /bin/bash
-
-#   usershare max shares = 100
-
-   usershare allow guests = yes
-
-#======================= Share Definitions =======================
-
-;[homes]
-;   comment = Home Directories
-;   browseable = no
-;   read only = yes
-;   create mask = 0700
-;   directory mask = 0700
-```
-
-### Mount Direktori pada Samba Server
-
-Tambahkan konfigurasi berikut pada line paling bawah `smb.conf`
-
-- `/etc/samba/smb.conf`
-```conf
-[bagibagi]
-    comment = Samba on Ubuntu
-    path = /path/to/your/directory
-    read only = no
-    browsable = yes
-    writable = yes
-    guest ok = no
-```
-
-Setelah kalian menambahkan konfigurasi tersebut, maka nantinya semua file yang terdapat pada direktori `/path/to/your/directory` dapat diakses oleh user yang terdaftar melalui koneksi SMB `\\[IP]\bagibagi`.
-
-> `Catatan`: Pastikan agar path yang dimasukkan merupakan absolute path yang dimulai dari root directory (`/`)
-
-Kalian juga dapat membagikan direktori home kalian dengan men-<i>uncomment</i> (menghapus tanda titik koma) bagian `[homes]` pada Share Definitions. Dengan begitu, kalian dapat mengakses file server pada windows dengan menambahkan koneksi ke `\\[IP_ADDR]\[user_name]` pada network map di windows kalian.
-
-## 3. Menambahkan User pada Samba
-
-Untuk menjaga keamanan File Server, sangat disarankan agar direktori yang dibagikan hanya dapat diakses oleh user yang ditambahkan pada samba. Gunakan perintah berikut untuk menambahkan user pada samba
-
-> `Catatan:` Hanya user yang sudah terdaftar pada mesin linux kalian yang bisa ditambahkan pada daftar user samba.
-
-- pada terminal
-```bash
-sudo smbpasswd -a username
-```
-
-Nantinya kalian akan diminta untuk memasukkan password yang akan digunakan oleh user tersebut untuk tersambund dengan server. (password tidak harus sama dengan password user pada linux)
-
-![add user samba](./img/samba_add_user.png)
-
-Setelah muncul pesan `Added user username.` maka user kalian telah berhasil ditambahkan.
-
-> `Catatan:` Apabila user yang kalian tambahkan berbeda dengan user yang biasa kalian gunakan, ada baiknya agar kalian menambahkan user tersebut ke `group` user biasa kalian agar user yang ditambahkan juga memiliki akses yang sama dnegan user biasa. Atau bisa juga dengan mengubah akses direktori yang dibagikan sesuai dengan keperluan kalian
-
-## 4. Terhubung pada Samba Server
-
-### Mencari IP Address
-
-Untuk memeriksa IP Address pada mesin linux kita, dapat menggunakan perintah
-
-- terminal
-```bash
-ip addr
-```
-
-Perhatikan pada bagian `eth0`, IP terdapat pada baris yang memiliki kata `inet`
-
-![contoh Ip Address](./img/contoh_ip.png)
-
-Pada contoh tersebut, dpaat terlihat bahwa IP Addressnya adalah `172.24.90.208`
-
-### Menghubungkan Server
-
-#### Pada Ubuntu
-
-- buka `file manager` lalu pilih `connect to server` dan masukkan
-
-![samba ubuntu](./img/samba_ubuntu.png)
-
-#### Pada MacOS
-
-- Pada menu `Finder`, klik `Go` lalu `Connect to Server` dan masukkan
-
-![samba macos](./img/samba_mac.png)
-
-#### Pada Windows
-
-- masuk pada `file manager` lalu masukkan ini pada `file path`
-
-![samba connect windows](./img/samba%20connect%20windows.png)
-
-- apabila tidak berhasil gunakan cara lain. pada `file manager` klik kanan bagian `network` lalu pilih `map network drive` dan masukkan
-
-![sambaltado](./img/samba_windows_alt.png)
-
-> <b>Jangan lupa</b> untuk mengubah `ip-address` menjadi alamat IP kalian dan `sambashare` menjadi sesuai dengan konfigurasi yang telah kalian tambahkan sebelumnya
-
-### Login untuk Masuk ke Server
-
-Masukkan `user` dan `password` sesuai dengan kredensial user yang telah kalian tambahkan sebelumnya.
-
-![samba login](./img/Screenshot%202024-05-11%20170116.png)
-
-Apabila kalian tidak berhasil login, coba perbaiki akses direktori kalian atau perbarui akses user kalian.
-
-## 5. Mematikan Samba Server
-
-Setelah menyelesaikan praktikum, sebaiknya server samba yang telah digunakan dimatikan. Hal ini untuk mencegah kejadian yang tidak diinginkan seperti masuknya pengguna asing melalui celah dari Samba Server ini.
-
-> `Catatan:` Pada windows, sebaiknya disconnect dulu dari Samba Server sebelum mematikan servernya.
-
-Untuk mematikan Server, gunakan perintah
-```bash
-sudo service smbd stop
-```
-
-kalian juga bisa menghapus program Samba dengan perintah
-```bash
-sudo apt remove samba
-```
-
 # Docker
 
 ## Docker Dasar
@@ -1158,6 +911,257 @@ Langkah-langkah berikut ini akan membantu dalam mengimplementasikan integrasi FU
 Dengan mengikuti langkah-langkah di atas, kamu akan berhasil mengintegrasikan file system FUSE dengan kontainer Docker. Kamu dapat menggunakan file system FUSE untuk mengakses sumber daya eksternal atau menerapkan fitur-fitur kustom sesuai kebutuhan aplikasi yang berjalan di dalam kontainer Docker.
 
 Pastikan untuk mengganti [nama_image_docker], [path_ke_file_system_fuse], dan [path_tujuan_di_dalam_kontainer] sesuai dengan kebutuhan dan konfigurasi spesifik yang kamu miliki.
+
+# Pengetahuan Tambahan
+
+# Samba
+
+Samba merupakan sebuah program yang dapat digunakan untuk membuat sebuah file server. Samba mampu mengintegrasikan server linux / unix atau windows menjadi <i>Active Directory Environment</i> melalui jaringan SMB yang memungkinkan untuk berbagi sumber daya seperti data dan printer.
+
+Samba sering digunakan sebagai file server seperti google drive yang dapat digunakan bersama-sama. Konfigurasi dan penggunaannya yang mudah menjadikan Samba sebagai pilihan populer untuk pembuatan file server.
+
+![samba](./img/contoh%20samba.png)
+
+Samba juga dilengkapi dengan konfigurasi user sehingga keamanan file server dapat terjamin.
+
+Selengkapnya tentang Samba terdapat pada [link berikut](https://www.samba.org/samba/).
+
+## 1. Instalasi Samba
+
+Instalasi Samba dapat dilakukan dengan menggunakan perintah `apt install` seperti instalasi linux pada umumnya
+
+```bash
+sudo apt install samba
+```
+
+Untuk memeriksa apakah samba sudah terinstal, dapat digunakan beberapa cara berikut:
+
+- Periksa versi Samba
+  ```bash
+  smbd -V
+  ```
+
+  Apabila muncul versi dari Samba seperti pada contoh berikut,
+
+  ![samba_versi](./img/samba_ver.png)
+
+  maka samba telah berhasil diinstal
+
+- Periksa status service Samba
+  ```bash
+  service smbd status
+  ```
+
+  Status dapat berupa `active` ataupun `inactive`. Selama service smbd telah dikenali, maka Samba telah berhasil diinstal
+
+- Periksa direktori Samba
+  ```bash
+  ls /etc/samba
+  ```
+
+  File konfigurasi Samba terletak pada direktori `/etc/samba` yang terbuat secara otomatis ketika menginstal Samba. Apabila direktori tersebut telah muncul, maka instalasi Samba berhasil dilakukan.
+
+## 2. Konfigurasi Samba
+
+Saat membuka file konfigurasi Samba `smb.conf`, kalian akan bertemu dengan konfigurasi default Samba yang mencapai lebih dari 200 baris.
+
+Namun dalam praktikum ini, kita akan membuat konfigurasi kita sendiri, sehingga konfigurasi default dari Samba dapat kita hiraukan.
+
+### Konfigurasi Default
+
+Untuk memudahkan pembacaan, kalian bisa gunakan konfigurasi ini sebagai konfigurasi default kalian
+
+- `/etc/samba/smb.conf`
+```conf
+#======================= Global Settings =======================
+
+[global]
+
+## Browsing/Identification ###
+
+   workgroup = WORKGROUP
+
+   server string = %h server (Samba, Ubuntu)
+
+
+#### Networking ####
+
+;   interfaces = 127.0.0.0/8 eth0
+
+;   bind interfaces only = yes
+
+
+#### Debugging/Accounting ####
+
+   log file = /var/log/samba/log.%m
+
+   max log size = 1000
+
+   logging = file
+
+   panic action = /usr/share/samba/panic-action %d
+
+
+####### Authentication #######
+
+   server role = standalone server
+
+   obey pam restrictions = yes
+
+   unix password sync = yes
+
+   passwd program = /usr/bin/passwd %u
+   passwd chat = *Enter\snew\s*\spassword:* %n\n *Retype\snew\s*\spassword:* %n\n *password\supdated\ssuccessfully* .
+
+   pam password change = yes
+
+   map to guest = bad user
+
+########## Domains ###########
+
+;   logon path = \\%N\profiles\%U
+
+;   logon drive = H:
+
+;   logon script = logon.cmd
+
+; add user script = /usr/sbin/adduser --quiet --disabled-password --gecos "" %u
+
+; add machine script  = /usr/sbin/useradd -g machines -c "%u machine account" -d /var/lib/samba -s /bin/false %u
+
+; add group script = /usr/sbin/addgroup --force-badname %g
+
+############ Misc ############
+
+;   include = /home/samba/etc/smb.conf.%m
+
+;   idmap config * :              backend = tdb
+;   idmap config * :              range   = 3000-7999
+;   idmap config YOURDOMAINHERE : backend = tdb
+;   idmap config YOURDOMAINHERE : range   = 100000-999999
+;   template shell = /bin/bash
+
+#   usershare max shares = 100
+
+   usershare allow guests = yes
+
+#======================= Share Definitions =======================
+
+;[homes]
+;   comment = Home Directories
+;   browseable = no
+;   read only = yes
+;   create mask = 0700
+;   directory mask = 0700
+```
+
+### Mount Direktori pada Samba Server
+
+Tambahkan konfigurasi berikut pada line paling bawah `smb.conf`
+
+- `/etc/samba/smb.conf`
+```conf
+[bagibagi]
+    comment = Samba on Ubuntu
+    path = /path/to/your/directory
+    read only = no
+    browsable = yes
+    writable = yes
+    guest ok = no
+```
+
+Setelah kalian menambahkan konfigurasi tersebut, maka nantinya semua file yang terdapat pada direktori `/path/to/your/directory` dapat diakses oleh user yang terdaftar melalui koneksi SMB `\\[IP]\bagibagi`.
+
+> `Catatan`: Pastikan agar path yang dimasukkan merupakan absolute path yang dimulai dari root directory (`/`)
+
+Kalian juga dapat membagikan direktori home kalian dengan men-<i>uncomment</i> (menghapus tanda titik koma) bagian `[homes]` pada Share Definitions. Dengan begitu, kalian dapat mengakses file server pada windows dengan menambahkan koneksi ke `\\[IP_ADDR]\[user_name]` pada network map di windows kalian.
+
+## 3. Menambahkan User pada Samba
+
+Untuk menjaga keamanan File Server, sangat disarankan agar direktori yang dibagikan hanya dapat diakses oleh user yang ditambahkan pada samba. Gunakan perintah berikut untuk menambahkan user pada samba
+
+> `Catatan:` Hanya user yang sudah terdaftar pada mesin linux kalian yang bisa ditambahkan pada daftar user samba.
+
+- pada terminal
+```bash
+sudo smbpasswd -a username
+```
+
+Nantinya kalian akan diminta untuk memasukkan password yang akan digunakan oleh user tersebut untuk tersambund dengan server. (password tidak harus sama dengan password user pada linux)
+
+![add user samba](./img/samba_add_user.png)
+
+Setelah muncul pesan `Added user username.` maka user kalian telah berhasil ditambahkan.
+
+> `Catatan:` Apabila user yang kalian tambahkan berbeda dengan user yang biasa kalian gunakan, ada baiknya agar kalian menambahkan user tersebut ke `group` user biasa kalian agar user yang ditambahkan juga memiliki akses yang sama dnegan user biasa. Atau bisa juga dengan mengubah akses direktori yang dibagikan sesuai dengan keperluan kalian
+
+## 4. Terhubung pada Samba Server
+
+### Mencari IP Address
+
+Untuk memeriksa IP Address pada mesin linux kita, dapat menggunakan perintah
+
+- terminal
+```bash
+ip addr
+```
+
+Perhatikan pada bagian `eth0`, IP terdapat pada baris yang memiliki kata `inet`
+
+![contoh Ip Address](./img/contoh_ip.png)
+
+Pada contoh tersebut, dpaat terlihat bahwa IP Addressnya adalah `172.24.90.208`
+
+### Menghubungkan Server
+
+#### Pada Ubuntu
+
+- buka `file manager` lalu pilih `connect to server` dan masukkan
+
+![samba ubuntu](./img/samba_ubuntu.png)
+
+#### Pada MacOS
+
+- Pada menu `Finder`, klik `Go` lalu `Connect to Server` dan masukkan
+
+![samba macos](./img/samba_mac.png)
+
+#### Pada Windows
+
+- masuk pada `file manager` lalu masukkan ini pada `file path`
+
+![samba connect windows](./img/samba%20connect%20windows.png)
+
+- apabila tidak berhasil gunakan cara lain. pada `file manager` klik kanan bagian `network` lalu pilih `map network drive` dan masukkan
+
+![sambaltado](./img/samba_windows_alt.png)
+
+> <b>Jangan lupa</b> untuk mengubah `ip-address` menjadi alamat IP kalian dan `sambashare` menjadi sesuai dengan konfigurasi yang telah kalian tambahkan sebelumnya
+
+### Login untuk Masuk ke Server
+
+Masukkan `user` dan `password` sesuai dengan kredensial user yang telah kalian tambahkan sebelumnya.
+
+![samba login](./img/Screenshot%202024-05-11%20170116.png)
+
+Apabila kalian tidak berhasil login, coba perbaiki akses direktori kalian atau perbarui akses user kalian.
+
+## 5. Mematikan Samba Server
+
+Setelah menyelesaikan praktikum, sebaiknya server samba yang telah digunakan dimatikan. Hal ini untuk mencegah kejadian yang tidak diinginkan seperti masuknya pengguna asing melalui celah dari Samba Server ini.
+
+> `Catatan:` Pada windows, sebaiknya disconnect dulu dari Samba Server sebelum mematikan servernya.
+
+Untuk mematikan Server, gunakan perintah
+```bash
+sudo service smbd stop
+```
+
+kalian juga bisa menghapus program Samba dengan perintah
+```bash
+sudo apt remove samba
+```
+
 
 # Soal Latihan
 
