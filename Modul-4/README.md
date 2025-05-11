@@ -10,7 +10,7 @@
 
 2. Peserta mengetahui dan mampu mengimplementasikan FUSE
    
-3. Peserta mampu melakukan konfigurasi dan implementasi Samba
+3. Peserta mampu melakukan konfigurasi dan implementasi Docker
 
 
 ## Daftar Isi
